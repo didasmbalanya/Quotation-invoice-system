@@ -1,0 +1,47 @@
+// src/controllers/quotationController.ts
+import { Request, Response } from "express";
+import { Quotation } from "../models";
+import { generateQuotationPDF } from "../services/pdfService";
+
+export const createQuotation = async (req: Request, res: Response) => {
+  try {
+    const quotation = await Quotation.create(req.body);
+    res.status(201).json(quotation);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to create quotation" });
+  }
+};
+
+export const listQuotations = async (req: Request, res: Response) => {
+  try {
+    const quotations = await Quotation.findAll();
+    res.status(200).json(quotations);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to retrieve quotations" });
+  }
+};
+
+export const updateQuotation = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    await Quotation.update(req.body, { where: { id } });
+    res.status(200).json({ message: "Quotation updated successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to update quotation" });
+  }
+};
+
+export const getQuotationPDF = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const quotation = await Quotation.findByPk(id);
+    if (!quotation) {
+      return res.status(404).json({ error: "Quotation not found" });
+    }
+    const pdfBuffer = await generateQuotationPDF(quotation);
+    res.setHeader("Content-Type", "application/pdf");
+    res.send(pdfBuffer);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to generate PDF" });
+  }
+};
