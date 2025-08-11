@@ -5,12 +5,13 @@ import {
   updateQuotation,
   getQuotationPDF,
 } from "../controllers/quotationController";
+import { validateQuotation } from "../middlewares";
 
 const router = Router();
 
-router.post("/", createQuotation);
+router.post("/", validateQuotation, createQuotation);
 router.get("/", listQuotations);
-router.patch("/:id", updateQuotation);
+router.patch("/:id",validateQuotation, updateQuotation);
 router.get("/:id/pdf", getQuotationPDF);
 
 export default router;
