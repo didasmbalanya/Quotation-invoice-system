@@ -8,6 +8,7 @@ export interface QuotationAttributes {
   quotationDate: Date;
   items: string;
   totalAmount: number;
+  status: "pending" | "approved" | "rejected";
   createdAt?: Date;
   updatedAt?: Date;
 }

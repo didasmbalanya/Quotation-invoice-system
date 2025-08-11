@@ -17,6 +17,7 @@ export class Quotation
   public phone!: string;
   public quotationDate!: Date;
   public items!: string;
+  public status: "pending" | "approved" | "rejected"  = "pending"; // Default status
   public totalAmount!: number;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -59,6 +60,11 @@ Quotation.init(
     totalAmount: {
       type: DataTypes.FLOAT,
       allowNull: false,
+    },
+    status: {
+      type: DataTypes.ENUM("pending", "approved", "rejected"),
+      allowNull: false,
+      defaultValue: "pending",
     },
   },
   {
