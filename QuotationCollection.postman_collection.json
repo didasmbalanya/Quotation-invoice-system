@@ -1,8 +1,8 @@
 {
   "info": {
-    "name": "Quotation API",
-    "_postman_id": "8f1b3a74-5c22-4d52-9e11-quotation-collection",
-    "description": "Postman collection for Quotation endpoints",
+    "name": "Quotation & Invoice API",
+    "_postman_id": "8f1b3a74-5c22-4d52-9e11-quotation-invoice-collection",
+    "description": "Postman collection for Quotation and Invoice endpoints",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -79,10 +79,51 @@
         }
       },
       "response": []
+    },
+    {
+      "name": "Create Invoice from Quotation",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/invoices/{{quotationId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "invoices", "{{quotationId}}"]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "if (jsonData.id) {",
+              "    pm.collectionVariables.set(\"invoiceId\", jsonData.id[0] || jsonData.id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Invoice PDF",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/invoices/{{invoiceId}}/pdf",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "invoices", "{{invoiceId}}", "pdf"]
+        }
+      },
+      "response": []
     }
   ],
   "variable": [
     { "key": "baseUrl", "value": "http://localhost:3000" },
-    { "key": "quotationId", "value": "" }
+    { "key": "quotationId", "value": "" },
+    { "key": "invoiceId", "value": "" }
   ]
 }

@@ -4,107 +4,167 @@ import path from "path";
 import { InvoiceAttributes, QuotationAttributes } from "../types";
 
 const secondaryColor = "#a07a3f";
+const accentColor = "#f5e7d0";
+const tableHeaderBg = "#e6d3b3";
+const tableRowEven = "#f8f6f2";
+const tableRowOdd = "#fff";
+const footerBg = "#a07a3f";
 const logoPath = path.join(__dirname, "../assets/logo.png");
 
 function addHeader(doc: typeof PDFDocument, title: string) {
+  // Header background
+  doc.rect(0, 0, doc.page.width, 120).fill(accentColor);
+
   // Logo
   if (fs.existsSync(logoPath)) {
-    doc.image(logoPath, 50, 40, { width: 100 });
+    doc.image(logoPath, 60, 35, { width: 80 });
   }
 
   // Business Info
   doc
-    .fontSize(16)
+    .font("Helvetica-Bold")
+    .fontSize(20)
     .fillColor(secondaryColor)
-    .text("CIALA RESORT KISUMU", 200, 50, { align: "right" })
-    .fontSize(10)
+    .text("CIALA RESORT KISUMU", 160, 40, { align: "right" })
+    .font("Helvetica")
+    .fontSize(11)
     .fillColor("black")
     .text("Kisumu", { align: "right" })
     .text("Phone: +254 700 000 000", { align: "right" })
     .text("Email: info@cialaexample.com", { align: "right" });
 
-  doc.moveDown();
-  doc.moveTo(50, 110).lineTo(550, 110).strokeColor(secondaryColor).stroke();
-
   // Title
   doc
-    .moveDown()
-    .fontSize(20)
+    .moveDown(2)
+    .font("Helvetica-Bold")
+    .fontSize(26)
     .fillColor(secondaryColor)
-    .text(title, { align: "center" });
-  doc.moveDown();
+    .text(title, 0, 110, { align: "center" });
+
+  // Divider
+  doc
+    .moveTo(50, 145)
+    .lineTo(550, 145)
+    .strokeColor(secondaryColor)
+    .lineWidth(1.5)
+    .stroke();
+  doc.moveDown(2);
 }
 
 function addFooter(doc: typeof PDFDocument) {
-  doc.moveTo(50, 750).lineTo(550, 750).strokeColor(secondaryColor).stroke();
+  // Footer background
+  doc.rect(0, 740, doc.page.width, 40).fill(footerBg);
+
   doc
     .fontSize(9)
-    .fillColor("black")
+    .fillColor("white")
     .text(
       "Thank you for choosing Ciala Resort Kisumu. For inquiries, contact info@cialaexample.com",
-      50,
-      760,
-      { align: "center" }
+      0,
+      752,
+      { align: "center", width: doc.page.width }
     );
 }
 
-function addClientDetails(doc: typeof PDFDocument, quotation: QuotationAttributes) {
+function addClientDetails(
+  doc: typeof PDFDocument,
+  quotation: QuotationAttributes
+) {
   doc
-    .fontSize(12)
+    .moveDown(1)
+    .font("Helvetica-Bold")
+    .fontSize(13)
+    .fillColor(secondaryColor)
+    .text("Client Details", 50, doc.y);
+
+  doc
+    .moveDown(0.5)
+    .font("Helvetica")
+    .fontSize(11)
     .fillColor("black")
-    .text(`Client: ${quotation.clientName}`)
-    .text(`Email: ${quotation.email}`)
-    .text(`Phone: ${quotation.phone}`)
-    .text(`Date: ${quotation.quotationDate}`);
-  doc.moveDown();
+    .text(`Name: `, 60, doc.y, { continued: true })
+    .font("Helvetica-Bold")
+    .text(quotation.clientName)
+    .font("Helvetica")
+    .text(`Email: `, 60, doc.y, { continued: true })
+    .font("Helvetica-Bold")
+    .text(quotation.email)
+    .font("Helvetica")
+    .text(`Phone: `, 60, doc.y, { continued: true })
+    .font("Helvetica-Bold")
+    .text(quotation.phone)
+    .font("Helvetica")
+    .text(`Date: `, 60, doc.y, { continued: true })
+    .font("Helvetica-Bold")
+    .text(`${quotation.quotationDate}`);
+
+  doc.moveDown(1.5);
 }
 
-function addItemsTable(doc: typeof PDFDocument, items: any[], totalAmount: number) {
-  const startY = doc.y;
-  const tableTop = startY;
-  const itemSpacing = 20;
+function addItemsTable(
+  doc: typeof PDFDocument,
+  items: any[],
+  totalAmount: number
+) {
+  const tableTop = doc.y;
+  const itemSpacing = 24;
   let rowY = tableTop;
 
   // Table Header
   doc
+    .font("Helvetica-Bold")
     .fontSize(12)
-    .fillColor("white")
+    .fillColor("black")
     .rect(50, rowY, 500, itemSpacing)
-    .fill(secondaryColor)
-    .fillColor("white")
-    .text("Item", 55, rowY + 5)
-    .text("Qty", 300, rowY + 5)
-    .text("Price", 350, rowY + 5)
-    .text("Total", 450, rowY + 5);
+    .fill(tableHeaderBg)
+    .strokeColor(secondaryColor)
+    .lineWidth(1)
+    .stroke()
+    .fillColor(secondaryColor)
+    .text("Item", 60, rowY + 6)
+    .text("Qty", 270, rowY + 6, { width: 40, align: "right" })
+    .text("Price", 340, rowY + 6, { width: 60, align: "right" })
+    .text("Total", 450, rowY + 6, { width: 80, align: "right" });
 
   rowY += itemSpacing;
 
   // Table Rows
   items.forEach((item, i) => {
-    const isEven = i % 2 === 0;
+    const bgColor = i % 2 === 0 ? tableRowEven : tableRowOdd;
     doc
+      .font("Helvetica")
+      .fontSize(11)
       .fillColor("black")
       .rect(50, rowY, 500, itemSpacing)
-      .fill(isEven ? "#f8f8f8" : "white")
+      .fill(bgColor)
+      .strokeColor("#e0e0e0")
+      .lineWidth(0.5)
+      .stroke()
       .fillColor("black")
-      .text(item.name, 55, rowY + 5)
-      .text(item.qty.toString(), 300, rowY + 5)
-      .text(item.price.toFixed(2), 350, rowY + 5)
-      .text((item.qty * item.price).toFixed(2), 450, rowY + 5);
+      .text(item.name, 60, rowY + 6)
+      .text(item.qty.toString(), 270, rowY + 6, { width: 40, align: "right" })
+      .text(item.price.toFixed(2), 340, rowY + 6, { width: 60, align: "right" })
+      .text((item.qty * item.price).toFixed(2), 450, rowY + 6, {
+        width: 80,
+        align: "right",
+      });
 
     rowY += itemSpacing;
   });
 
   // Total Row
   doc
+    .font("Helvetica-Bold")
+    .fontSize(13)
+    .fillColor("white")
     .rect(50, rowY, 500, itemSpacing)
     .fill(secondaryColor)
-    .fillColor("white")
-    .fontSize(12)
-    .text("Total", 350, rowY + 5)
-    .text(totalAmount.toFixed(2), 450, rowY + 5);
+    .strokeColor(secondaryColor)
+    .stroke()
+    .text("Total", 340, rowY + 6, { width: 60, align: "right" })
+    .text(totalAmount.toFixed(2), 450, rowY + 6, { width: 80, align: "right" });
 
-  doc.moveDown();
+  doc.moveDown(2);
 }
 
 export const generateQuotationPDF = async (
@@ -138,11 +198,26 @@ export const generateInvoicePDF = async (
 
   addHeader(doc, "INVOICE");
   doc
-    .fontSize(12)
+    .moveDown(1)
+    .font("Helvetica-Bold")
+    .fontSize(13)
+    .fillColor(secondaryColor)
+    .text("Invoice Details", 50, doc.y);
+
+  doc
+    .moveDown(0.5)
+    .font("Helvetica")
+    .fontSize(11)
     .fillColor("black")
-    .text(`Invoice #: ${invoice.invoiceNumber}`)
-    .text(`Invoice Date: ${invoice.invoiceDate}`);
-  doc.moveDown();
+    .text(`Invoice #: `, 60, doc.y, { continued: true })
+    .font("Helvetica-Bold")
+    .text(invoice.invoiceNumber)
+    .font("Helvetica")
+    .text(`Invoice Date: `, 60, doc.y, { continued: true })
+    .font("Helvetica-Bold")
+    .text(`${invoice.invoiceDate}`);
+
+  doc.moveDown(1);
 
   addClientDetails(doc, quotation);
   addItemsTable(doc, JSON.parse(quotation.items), quotation.totalAmount);
