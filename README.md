@@ -12,6 +12,8 @@ A backend service for managing quotations and invoices for a restaurant system.
 ## Tech Stack
 
 - Node.js
+
+
 - TypeScript
 - Express.js
 - Sequelize ORM

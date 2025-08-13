@@ -1,0 +1,88 @@
+{
+  "info": {
+    "name": "Quotation API",
+    "_postman_id": "8f1b3a74-5c22-4d52-9e11-quotation-collection",
+    "description": "Postman collection for Quotation endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Quotation",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"clientName\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"phone\": \"+1234567890\",\n  \"quotationDate\": \"2025-08-11\",\n  \"items\": \"[{\\\"name\\\":\\\"Burger\\\",\\\"qty\\\":2,\\\"price\\\":5.5},{\\\"name\\\":\\\"Fries\\\",\\\"qty\\\":1,\\\"price\\\":2.0}]\",\n  \"totalAmount\": 13.0,\n  \"status\": \"pending\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/quotations",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "quotations"]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "if (jsonData.id) {",
+              "    pm.collectionVariables.set(\"quotationId\", jsonData.id[0] || jsonData.id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "List Quotations",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/quotations",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "quotations"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update Quotation",
+      "request": {
+        "method": "PATCH",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"clientName\": \"John Doe Updated\",\n  \"email\": \"john.updated@example.com\",\n  \"phone\": \"+1234567890\",\n  \"quotationDate\": \"2025-08-12\",\n  \"items\": \"[{\\\"name\\\":\\\"Pizza\\\",\\\"qty\\\":1,\\\"price\\\":8.0}]\",\n  \"totalAmount\": 8.0,\n  \"status\": \"approved\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/quotations/{{quotationId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "quotations", "{{quotationId}}"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Quotation PDF",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/quotations/{{quotationId}}/pdf",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "quotations", "{{quotationId}}", "pdf"]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "quotationId", "value": "" }
+  ]
+}
