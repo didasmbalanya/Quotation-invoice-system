@@ -166,7 +166,7 @@ function addItemsTable(
           .fillColor("#444")
           .text(`• ${sub}`, descX + 12, y + 3, { width: descWidth - 12 });
 
-        y += subHeight + 4; 
+        y += subHeight + 4;
       });
     }
   });
@@ -221,37 +221,30 @@ function addItemsTable(
     );
 }
 
-function addFooter(doc: PDFKit.PDFDocument) {
-  const requiredFooterHeight = 200;
-  if (
-    doc.y + requiredFooterHeight >
-    doc.page.height - doc.page.margins.bottom
-  ) {
-    doc.addPage();
-  }
+function addFooter(doc: PDFKit.PDFDocument, totalAmount: number) {
+  const minFooterY = doc.y + 30;
+  const footerY = Math.max(doc.y + 30, minFooterY);
 
-  const startY = doc.y + 30;
+  // --- Terms & Conditions box (left) ---
   const leftX = 50;
-  const rightX = 330;
-  const boxWidth = 240;
-  const boxHeight = 150;
+  const boxWidth = 270;
+  const boxHeight = 90;
 
-  // Draw left box (Terms)
   doc
-    .rect(leftX, startY, boxWidth, boxHeight)
+    .rect(leftX, footerY, boxWidth, boxHeight)
     .strokeColor("#a07a3f")
     .lineWidth(1)
     .stroke();
 
   doc
     .font("Helvetica-Bold")
-    .fontSize(12)
+    .fontSize(11)
     .fillColor("#a07a3f")
-    .text("Terms & Conditions", leftX + 8, startY + 8);
+    .text("Terms & Conditions", leftX + 8, footerY + 8);
 
   doc
     .font("Helvetica")
-    .fontSize(10)
+    .fontSize(9)
     .fillColor("black")
     .text(
       "1. Our credit terms are 30 days after dispatch of the invoice.\n" +
@@ -260,57 +253,63 @@ function addFooter(doc: PDFKit.PDFDocument) {
         "4. Cancellation fee equivalent to 50% applies if within 48hrs.\n" +
         "5. No-show fee equivalent to 100% of the quote will be charged.",
       leftX + 8,
-      startY + 28,
+      footerY + 28,
       { width: boxWidth - 16 }
     );
 
-  // Draw right box (Bank Details)
+  // --- Bank Details (right of Terms & Conditions) ---
+  const rightX = leftX + boxWidth + 20;
+  const bankBoxWidth = 220;
+  const bankBoxHeight = 90;
+
   doc
-    .rect(rightX, startY, boxWidth, boxHeight)
+    .rect(rightX, footerY, bankBoxWidth, bankBoxHeight)
     .strokeColor("#a07a3f")
     .lineWidth(1)
     .stroke();
 
   doc
     .font("Helvetica-Bold")
-    .fontSize(12)
+    .fontSize(11)
     .fillColor("#a07a3f")
-    .text("Bank Details", rightX + 8, startY + 8);
+    .text("Bank Details", rightX + 8, footerY + 8);
 
   doc
     .font("Helvetica")
-    .fontSize(10)
+    .fontSize(9)
     .fillColor("black")
-    .text(
-      "BANK: KCB\n" +
-        "ACCOUNT NAME: CIALA RESORT KENYA LIMITED\n" +
-        "ACCOUNT NO: 123528287\n" +
-        "BRANCH: KISUMU\n" +
-        "RTGS IFSC CODE: KCBLKENX",
-      rightX + 8,
-      startY + 28,
-      { width: boxWidth - 16 }
-    );
-
-  // Optional: Add a horizontal line above the footer for separation
-  doc
-    .moveTo(leftX, startY - 10)
-    .lineTo(leftX + boxWidth * 2 + 30, startY - 10)
-    .strokeColor("#a07a3f")
-    .lineWidth(1)
-    .stroke();
+    .text("BANK", rightX + 8, footerY + 28, { continued: true })
+    .font("Helvetica-Bold")
+    .text(" : KCB")
+    .font("Helvetica")
+    .text("ACCOUNT NAME", rightX + 8, doc.y, { continued: true })
+    .font("Helvetica-Bold")
+    .text(" : CIALA RESORT KENYA LIMITED")
+    .font("Helvetica")
+    .text("ACCOUNT NO", rightX + 8, doc.y, { continued: true })
+    .font("Helvetica-Bold")
+    .text(" : 123528287")
+    .font("Helvetica")
+    .text("BRANCH", rightX + 8, doc.y, { continued: true })
+    .font("Helvetica-Bold")
+    .text(" : KISUMU")
+    .font("Helvetica")
+    .text("RTGS IFSC CODE", rightX + 8, doc.y, { continued: true })
+    .font("Helvetica-Bold")
+    .text(" : KCBLKENX");
 
   doc
     .font("Helvetica")
-    .fontSize(10)
+    .fontSize(9)
     .fillColor("black")
     .text(
       "If you have any questions about this Quotation, please contact COLLINS OTIENO 0710 167449, Email: bdm@cialaresort.com",
-      leftX,
-      startY + boxHeight + 25,
-      { width: boxWidth * 2 + 30, align: "center" }
+      50,
+      doc.page.height - 60,
+      { width: 500, align: "center" }
     );
 }
+
 
 export const generateQuotationPDF = async (
   quotation: QuotationAttributes
@@ -323,7 +322,7 @@ export const generateQuotationPDF = async (
   addHeader(doc, "QUOTATION");
   addClientSection(doc, quotation);
   addItemsTable(doc, quotation.items, quotation.totalAmount);
-  addFooter(doc);
+  addFooter(doc, quotation.totalAmount); 
 
   doc.end();
 
@@ -344,7 +343,7 @@ export const generateInvoicePDF = async (
   addHeader(doc, "INVOICE");
   addClientSection(doc, quotation);
   addItemsTable(doc, quotation.items, quotation.totalAmount);
-  addFooter(doc);
+  addFooter(doc, quotation.totalAmount);
 
   doc.end();
 
