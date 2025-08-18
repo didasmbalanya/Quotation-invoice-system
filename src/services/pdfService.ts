@@ -47,7 +47,10 @@ function addHeader(doc: PDFKit.PDFDocument, title: string) {
   doc.moveDown(1);
 }
 
-function addClientSection(doc: PDFKit.PDFDocument, quotation: QuotationAttributes) {
+function addClientSection(
+  doc: PDFKit.PDFDocument,
+  quotation: QuotationAttributes
+) {
   doc
     .font("Helvetica-Bold")
     .fontSize(12)
@@ -63,13 +66,21 @@ function addClientSection(doc: PDFKit.PDFDocument, quotation: QuotationAttribute
   doc
     .font("Helvetica")
     .fontSize(11)
-    .text(`DATE: ${new Date(quotation.quotationDate).toLocaleDateString()}`, 400, 200)
+    .text(
+      `DATE: ${new Date(quotation.quotationDate).toLocaleDateString()}`,
+      400,
+      200
+    )
     .text(`QUOTE #: ${quotation.id || "-"}`, 400)
     .text("Valid Until: 30 Days", 400)
     .moveDown(1);
 }
 
-function addItemsTable(doc: PDFKit.PDFDocument, rawItems: any, totalAmount: number) {
+function addItemsTable(
+  doc: PDFKit.PDFDocument,
+  rawItems: any,
+  totalAmount: number
+) {
   const items = parseItems(rawItems);
 
   const tableTop = doc.y + 20;
@@ -89,10 +100,7 @@ function addItemsTable(doc: PDFKit.PDFDocument, rawItems: any, totalAmount: numb
 
   // Rows
   items.forEach((item) => {
-    doc
-      .font("Helvetica")
-      .fontSize(10)
-      .text(item.name, 50, y);
+    doc.font("Helvetica").fontSize(10).text(item.name, 50, y);
 
     if (item.subItems && Array.isArray(item.subItems)) {
       item.subItems.forEach((sub: any) => {
@@ -124,21 +132,87 @@ function addItemsTable(doc: PDFKit.PDFDocument, rawItems: any, totalAmount: numb
 }
 
 function addFooter(doc: PDFKit.PDFDocument) {
+  const startY = doc.y + 30;
+  const leftX = 50;
+  const rightX = 330;
+  const boxWidth = 240;
+  const boxHeight = 150; 
+
+  // Draw left box (Terms)
   doc
-    .moveDown(3)
+    .rect(leftX, startY, boxWidth, boxHeight)
+    .strokeColor("#a07a3f")
+    .lineWidth(1)
+    .stroke();
+
+  doc
+    .font("Helvetica-Bold")
+    .fontSize(12)
+    .fillColor("#a07a3f")
+    .text("Terms & Conditions", leftX + 8, startY + 8);
+
+  doc
     .font("Helvetica")
-    .fontSize(9)
-    .text("1. Our credit terms are 30 days after dispatch of the invoice.")
-    .text("2. Duly signed LPO or Down payment is required to confirm booking.")
-    .text("3. The quotation is inclusive of all taxes.")
-    .text("4. Cancellation fee equivalent to 50% applies if within 48hrs.")
-    .text("5. No-show fee equivalent to 100% of the quote will be charged.")
-    .moveDown(2)
-    .text("BANK: KCB")
-    .text("ACCOUNT NAME: CIALA RESORT KENYA LIMITED")
-    .text("ACCOUNT NO: 123528287")
-    .text("BRANCH: KISUMU")
-    .text("RTGS IFSC CODE: KCBLKENX");
+    .fontSize(10)
+    .fillColor("black")
+    .text(
+      "1. Our credit terms are 30 days after dispatch of the invoice.\n" +
+        "2. Duly signed LPO or Down payment is required to confirm booking.\n" +
+        "3. The quotation is inclusive of all taxes.\n" +
+        "4. Cancellation fee equivalent to 50% applies if within 48hrs.\n" +
+        "5. No-show fee equivalent to 100% of the quote will be charged.",
+      leftX + 8,
+      startY + 28,
+      { width: boxWidth - 16 }
+    );
+
+  // Draw right box (Bank Details)
+  doc
+    .rect(rightX, startY, boxWidth, boxHeight)
+    .strokeColor("#a07a3f")
+    .lineWidth(1)
+    .stroke();
+
+  doc
+    .font("Helvetica-Bold")
+    .fontSize(12)
+    .fillColor("#a07a3f")
+    .text("Bank Details", rightX + 8, startY + 8);
+
+  doc
+    .font("Helvetica")
+    .fontSize(10)
+    .fillColor("black")
+    .text(
+      "BANK: KCB\n" +
+        "ACCOUNT NAME: CIALA RESORT KENYA LIMITED\n" +
+        "ACCOUNT NO: 123528287\n" +
+        "BRANCH: KISUMU\n" +
+        "RTGS IFSC CODE: KCBLKENX",
+      rightX + 8,
+      startY + 28,
+      { width: boxWidth - 16 }
+    );
+
+  // Optional: Add a horizontal line above the footer for separation
+  doc
+    .moveTo(leftX, startY - 10)
+    .lineTo(leftX + boxWidth * 2 + 30, startY - 10)
+    .strokeColor("#a07a3f")
+    .lineWidth(1)
+    .stroke();
+
+  // Move contact info further down
+  doc
+    .font("Helvetica")
+    .fontSize(10)
+    .fillColor("black")
+    .text(
+      "If you have any questions about this Quotation, please contact COLLINS OTIENO 0710 167449, Email: bdm@cialaresort.com",
+      leftX,
+      startY + boxHeight + 25,
+      { width: boxWidth * 2 + 30, align: "center" }
+    );
 }
 
 export const generateQuotationPDF = async (
