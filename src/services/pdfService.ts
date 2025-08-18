@@ -22,29 +22,30 @@ function parseItems(items: any): any[] {
 
 function addHeader(doc: PDFKit.PDFDocument, title: string) {
   if (fs.existsSync(logoPath)) {
-    doc.image(logoPath, 50, 40, { width: 100 });
+    doc.image(logoPath, 50, 40, { width: 80 });
   }
 
   doc
     .font("Helvetica-Bold")
-    .fontSize(20)
+    .fontSize(14)
     .fillColor(secondaryColor)
-    .text("CIALA RESORT KISUMU", 200, 50, { align: "right" })
+    .text("CIALA RESORT KISUMU", 150, 45, { align: "right" })
+    .font("Helvetica")
     .fontSize(10)
     .fillColor("black")
     .text("P.O. BOX 7490-40100 KISUMU", { align: "right" })
-    .text("Phone: 0705335555 / 0710167449", { align: "right" })
-    .text("Email: bdm@cialaressort.com", { align: "right" })
+    .text("PHONE: 0705335555 / 0710167449", { align: "right" })
+    .text("Email: bdm@cialaresort.com", { align: "right" })
     .text("Website: www.cialaresort.com", { align: "right" });
 
   doc
-    .moveDown(2)
+    .moveDown(1)
     .font("Helvetica-Bold")
-    .fontSize(16)
+    .fontSize(13)
     .fillColor(secondaryColor)
     .text(title, { align: "center" });
 
-  doc.moveDown(1);
+  doc.moveDown(0.5);
 }
 
 function addClientSection(
@@ -83,52 +84,59 @@ function addItemsTable(
 ) {
   const items = parseItems(rawItems);
 
-  const tableTop = doc.y + 20;
+  const tableTop = doc.y + 10;
   let y = tableTop;
 
-  // Header
+  // Table Header
+  doc.rect(50, y, 500, 20).fill(secondaryColor).stroke(); // changed from 430 to 500
+
   doc
     .font("Helvetica-Bold")
-    .fontSize(11)
-    .fillColor("black")
-    .text("DESCRIPTION", 50, y)
-    .text("QTY", 270, y)
-    .text("UNIT PRICE", 340, y)
-    .text("AMOUNT", 450, y);
+    .fontSize(10)
+    .fillColor("white")
+    .text("DESCRIPTION", 54, y + 5)
+    .text("QTY", 270, y + 5)
+    .text("UNIT PRICE", 340, y + 5)
+    .text("AMOUNT", 450, y + 5);
 
   y += 20;
 
-  // Rows
-  items.forEach((item) => {
-    doc.font("Helvetica").fontSize(10).text(item.name, 50, y);
-
-    if (item.subItems && Array.isArray(item.subItems)) {
-      item.subItems.forEach((sub: any) => {
-        y += 15;
-        doc.font("Helvetica-Oblique").fontSize(9).text(`* ${sub}`, 60, y);
-      });
+  // Table Rows
+  items.forEach((item, idx) => {
+    // Optional: alternate row color
+    if (idx % 2 === 0) {
+      doc.rect(50, y, 500, 20).fill("#fff").stroke();
+    } else {
+      doc.rect(50, y, 500, 20).fill("#f8f6f2").stroke();
     }
 
     doc
       .font("Helvetica")
       .fontSize(10)
-      .text(item.qty?.toString() || "-", 270, y)
-      .text(item.price?.toFixed(2) || "0.00", 340, y)
-      .text(((item.qty || 0) * (item.price || 0)).toFixed(2), 450, y);
+      .fillColor("black")
+      .text(item.name, 54, y + 5)
+      .text(item.qty?.toString() || "-", 270, y + 5)
+      .text(item.price?.toFixed(2) || "0.00", 340, y + 5)
+      .text(((item.qty || 0) * (item.price || 0)).toFixed(2), 450, y + 5);
 
     y += 20;
   });
 
-  // Totals
+  // Totals (styled to match screenshot)
   doc
     .font("Helvetica-Bold")
-    .fontSize(11)
-    .text("SUBTOTAL", 340, y + 10)
+    .fontSize(10)
+    .fillColor("black")
+    .text("SUB TOTAL", 340, y + 10)
     .text(totalAmount.toFixed(2), 450, y + 10)
-    .text("VAT (16%)", 340, y + 30)
+    .text("VAT 16%", 340, y + 30)
     .text((totalAmount * 0.16).toFixed(2), 450, y + 30)
-    .text("TOTAL", 340, y + 50)
-    .text((totalAmount * 1.16).toFixed(2), 450, y + 50);
+    .text("CLT 2%", 340, y + 50)
+    .text((totalAmount * 0.02).toFixed(2), 450, y + 50)
+    .text("SC 7%", 340, y + 70)
+    .text((totalAmount * 0.07).toFixed(2), 450, y + 70)
+    .text("TOTAL", 340, y + 90)
+    .text((totalAmount * 1.25).toFixed(2), 450, y + 90);
 }
 
 function addFooter(doc: PDFKit.PDFDocument) {
@@ -136,7 +144,7 @@ function addFooter(doc: PDFKit.PDFDocument) {
   const leftX = 50;
   const rightX = 330;
   const boxWidth = 240;
-  const boxHeight = 150; 
+  const boxHeight = 150;
 
   // Draw left box (Terms)
   doc
