@@ -4,7 +4,7 @@
   "description": "A backend service for managing quotations and invoices for a restaurant system.",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "ts-node src/index.ts",
+    "dev": "nodemon --exec ts-node src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "test": "jest"
@@ -28,6 +28,7 @@
     "@types/pdfkit": "^0.17.2",
     "@types/supertest": "^6.0.3",
     "jest": "^30.0.5",
+    "nodemon": "^3.1.10",
     "supertest": "^7.1.4",
     "ts-jest": "^29.4.1",
     "ts-node": "^10.4.0",

@@ -6,7 +6,7 @@ export interface QuotationAttributes {
   email: string;
   phone: string;
   quotationDate: Date;
-  items: string;
+  items: string | object;
   totalAmount: number;
   status: "pending" | "approved" | "rejected";
   createdAt?: Date;

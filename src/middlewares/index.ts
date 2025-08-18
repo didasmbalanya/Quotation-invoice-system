@@ -8,7 +8,7 @@ const quotationSchema = Joi.object<QuotationAttributes>({
   email: Joi.string().email().required(),
   phone: Joi.string().required(),
   quotationDate: Joi.date().required(),
-  items: Joi.string().required(), // If items is JSON, validate after parsing
+  items: Joi.alternatives().try(Joi.string(), Joi.array()).required(),
   totalAmount: Joi.number().required(),
   status: Joi.string().valid("pending", "approved", "rejected").optional(),
 });
@@ -33,7 +33,7 @@ export function validateQuotation(
   email: Joi.string().email().optional(),
   phone: Joi.string().optional(),
   quotationDate: Joi.date().optional(),
-  items: Joi.string().optional(), // Should be a stringified JSON
+  items: Joi.alternatives().try(Joi.string(), Joi.array()).optional(),
   totalAmount: Joi.number().optional(),
   status: Joi.string().valid("pending", "approved", "rejected").optional(),
 })

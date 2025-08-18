@@ -4,167 +4,141 @@ import path from "path";
 import { InvoiceAttributes, QuotationAttributes } from "../types";
 
 const secondaryColor = "#a07a3f";
-const accentColor = "#f5e7d0";
-const tableHeaderBg = "#e6d3b3";
-const tableRowEven = "#f8f6f2";
-const tableRowOdd = "#fff";
-const footerBg = "#a07a3f";
 const logoPath = path.join(__dirname, "../assets/logo.png");
 
-function addHeader(doc: typeof PDFDocument, title: string) {
-  // Header background
-  doc.rect(0, 0, doc.page.width, 120).fill(accentColor);
+function parseItems(items: any): any[] {
+  try {
+    if (typeof items === "string") {
+      return JSON.parse(items);
+    }
+    if (Array.isArray(items)) {
+      return items;
+    }
+    return [];
+  } catch (e) {
+    return [];
+  }
+}
 
-  // Logo
+function addHeader(doc: PDFKit.PDFDocument, title: string) {
   if (fs.existsSync(logoPath)) {
-    doc.image(logoPath, 60, 35, { width: 80 });
+    doc.image(logoPath, 50, 40, { width: 100 });
   }
 
-  // Business Info
   doc
     .font("Helvetica-Bold")
     .fontSize(20)
     .fillColor(secondaryColor)
-    .text("CIALA RESORT KISUMU", 160, 40, { align: "right" })
-    .font("Helvetica")
-    .fontSize(11)
+    .text("CIALA RESORT KISUMU", 200, 50, { align: "right" })
+    .fontSize(10)
     .fillColor("black")
-    .text("Kisumu", { align: "right" })
-    .text("Phone: +254 700 000 000", { align: "right" })
-    .text("Email: info@cialaexample.com", { align: "right" });
+    .text("P.O. BOX 7490-40100 KISUMU", { align: "right" })
+    .text("Phone: 0705335555 / 0710167449", { align: "right" })
+    .text("Email: bdm@cialaressort.com", { align: "right" })
+    .text("Website: www.cialaresort.com", { align: "right" });
 
-  // Title
   doc
     .moveDown(2)
     .font("Helvetica-Bold")
-    .fontSize(26)
+    .fontSize(16)
     .fillColor(secondaryColor)
-    .text(title, 0, 110, { align: "center" });
+    .text(title, { align: "center" });
 
-  // Divider
-  doc
-    .moveTo(50, 145)
-    .lineTo(550, 145)
-    .strokeColor(secondaryColor)
-    .lineWidth(1.5)
-    .stroke();
-  doc.moveDown(2);
+  doc.moveDown(1);
 }
 
-function addFooter(doc: typeof PDFDocument) {
-  // Footer background
-  doc.rect(0, 740, doc.page.width, 40).fill(footerBg);
-
-  doc
-    .fontSize(9)
-    .fillColor("white")
-    .text(
-      "Thank you for choosing Ciala Resort Kisumu. For inquiries, contact info@cialaexample.com",
-      0,
-      752,
-      { align: "center", width: doc.page.width }
-    );
-}
-
-function addClientDetails(
-  doc: typeof PDFDocument,
-  quotation: QuotationAttributes
-) {
-  doc
-    .moveDown(1)
-    .font("Helvetica-Bold")
-    .fontSize(13)
-    .fillColor(secondaryColor)
-    .text("Client Details", 50, doc.y);
-
-  doc
-    .moveDown(0.5)
-    .font("Helvetica")
-    .fontSize(11)
-    .fillColor("black")
-    .text(`Name: `, 60, doc.y, { continued: true })
-    .font("Helvetica-Bold")
-    .text(quotation.clientName)
-    .font("Helvetica")
-    .text(`Email: `, 60, doc.y, { continued: true })
-    .font("Helvetica-Bold")
-    .text(quotation.email)
-    .font("Helvetica")
-    .text(`Phone: `, 60, doc.y, { continued: true })
-    .font("Helvetica-Bold")
-    .text(quotation.phone)
-    .font("Helvetica")
-    .text(`Date: `, 60, doc.y, { continued: true })
-    .font("Helvetica-Bold")
-    .text(`${quotation.quotationDate}`);
-
-  doc.moveDown(1.5);
-}
-
-function addItemsTable(
-  doc: typeof PDFDocument,
-  items: any[],
-  totalAmount: number
-) {
-  const tableTop = doc.y;
-  const itemSpacing = 24;
-  let rowY = tableTop;
-
-  // Table Header
+function addClientSection(doc: PDFKit.PDFDocument, quotation: QuotationAttributes) {
   doc
     .font("Helvetica-Bold")
     .fontSize(12)
     .fillColor("black")
-    .rect(50, rowY, 500, itemSpacing)
-    .fill(tableHeaderBg)
-    .strokeColor(secondaryColor)
-    .lineWidth(1)
-    .stroke()
-    .fillColor(secondaryColor)
-    .text("Item", 60, rowY + 6)
-    .text("Qty", 270, rowY + 6, { width: 40, align: "right" })
-    .text("Price", 340, rowY + 6, { width: 60, align: "right" })
-    .text("Total", 450, rowY + 6, { width: 80, align: "right" });
+    .text("TO:", 50, doc.y)
+    .font("Helvetica")
+    .fontSize(11)
+    .text(`${quotation.clientName}`)
+    .text(`${quotation.email}`)
+    .text(`${quotation.phone}`)
+    .moveDown(1);
 
-  rowY += itemSpacing;
+  doc
+    .font("Helvetica")
+    .fontSize(11)
+    .text(`DATE: ${new Date(quotation.quotationDate).toLocaleDateString()}`, 400, 200)
+    .text(`QUOTE #: ${quotation.id || "-"}`, 400)
+    .text("Valid Until: 30 Days", 400)
+    .moveDown(1);
+}
 
-  // Table Rows
-  items.forEach((item, i) => {
-    const bgColor = i % 2 === 0 ? tableRowEven : tableRowOdd;
-    doc
-      .font("Helvetica")
-      .fontSize(11)
-      .fillColor("black")
-      .rect(50, rowY, 500, itemSpacing)
-      .fill(bgColor)
-      .strokeColor("#e0e0e0")
-      .lineWidth(0.5)
-      .stroke()
-      .fillColor("black")
-      .text(item.name, 60, rowY + 6)
-      .text(item.qty.toString(), 270, rowY + 6, { width: 40, align: "right" })
-      .text(item.price.toFixed(2), 340, rowY + 6, { width: 60, align: "right" })
-      .text((item.qty * item.price).toFixed(2), 450, rowY + 6, {
-        width: 80,
-        align: "right",
-      });
+function addItemsTable(doc: PDFKit.PDFDocument, rawItems: any, totalAmount: number) {
+  const items = parseItems(rawItems);
 
-    rowY += itemSpacing;
-  });
+  const tableTop = doc.y + 20;
+  let y = tableTop;
 
-  // Total Row
+  // Header
   doc
     .font("Helvetica-Bold")
-    .fontSize(13)
-    .fillColor("white")
-    .rect(50, rowY, 500, itemSpacing)
-    .fill(secondaryColor)
-    .strokeColor(secondaryColor)
-    .stroke()
-    .text("Total", 340, rowY + 6, { width: 60, align: "right" })
-    .text(totalAmount.toFixed(2), 450, rowY + 6, { width: 80, align: "right" });
+    .fontSize(11)
+    .fillColor("black")
+    .text("DESCRIPTION", 50, y)
+    .text("QTY", 270, y)
+    .text("UNIT PRICE", 340, y)
+    .text("AMOUNT", 450, y);
 
-  doc.moveDown(2);
+  y += 20;
+
+  // Rows
+  items.forEach((item) => {
+    doc
+      .font("Helvetica")
+      .fontSize(10)
+      .text(item.name, 50, y);
+
+    if (item.subItems && Array.isArray(item.subItems)) {
+      item.subItems.forEach((sub: any) => {
+        y += 15;
+        doc.font("Helvetica-Oblique").fontSize(9).text(`* ${sub}`, 60, y);
+      });
+    }
+
+    doc
+      .font("Helvetica")
+      .fontSize(10)
+      .text(item.qty?.toString() || "-", 270, y)
+      .text(item.price?.toFixed(2) || "0.00", 340, y)
+      .text(((item.qty || 0) * (item.price || 0)).toFixed(2), 450, y);
+
+    y += 20;
+  });
+
+  // Totals
+  doc
+    .font("Helvetica-Bold")
+    .fontSize(11)
+    .text("SUBTOTAL", 340, y + 10)
+    .text(totalAmount.toFixed(2), 450, y + 10)
+    .text("VAT (16%)", 340, y + 30)
+    .text((totalAmount * 0.16).toFixed(2), 450, y + 30)
+    .text("TOTAL", 340, y + 50)
+    .text((totalAmount * 1.16).toFixed(2), 450, y + 50);
+}
+
+function addFooter(doc: PDFKit.PDFDocument) {
+  doc
+    .moveDown(3)
+    .font("Helvetica")
+    .fontSize(9)
+    .text("1. Our credit terms are 30 days after dispatch of the invoice.")
+    .text("2. Duly signed LPO or Down payment is required to confirm booking.")
+    .text("3. The quotation is inclusive of all taxes.")
+    .text("4. Cancellation fee equivalent to 50% applies if within 48hrs.")
+    .text("5. No-show fee equivalent to 100% of the quote will be charged.")
+    .moveDown(2)
+    .text("BANK: KCB")
+    .text("ACCOUNT NAME: CIALA RESORT KENYA LIMITED")
+    .text("ACCOUNT NO: 123528287")
+    .text("BRANCH: KISUMU")
+    .text("RTGS IFSC CODE: KCBLKENX");
 }
 
 export const generateQuotationPDF = async (
@@ -176,8 +150,8 @@ export const generateQuotationPDF = async (
   doc.on("data", buffers.push.bind(buffers));
 
   addHeader(doc, "QUOTATION");
-  addClientDetails(doc, quotation);
-  addItemsTable(doc, JSON.parse(quotation.items), quotation.totalAmount);
+  addClientSection(doc, quotation);
+  addItemsTable(doc, quotation.items, quotation.totalAmount);
   addFooter(doc);
 
   doc.end();
@@ -197,30 +171,8 @@ export const generateInvoicePDF = async (
   doc.on("data", buffers.push.bind(buffers));
 
   addHeader(doc, "INVOICE");
-  doc
-    .moveDown(1)
-    .font("Helvetica-Bold")
-    .fontSize(13)
-    .fillColor(secondaryColor)
-    .text("Invoice Details", 50, doc.y);
-
-  doc
-    .moveDown(0.5)
-    .font("Helvetica")
-    .fontSize(11)
-    .fillColor("black")
-    .text(`Invoice #: `, 60, doc.y, { continued: true })
-    .font("Helvetica-Bold")
-    .text(invoice.invoiceNumber)
-    .font("Helvetica")
-    .text(`Invoice Date: `, 60, doc.y, { continued: true })
-    .font("Helvetica-Bold")
-    .text(`${invoice.invoiceDate}`);
-
-  doc.moveDown(1);
-
-  addClientDetails(doc, quotation);
-  addItemsTable(doc, JSON.parse(quotation.items), quotation.totalAmount);
+  addClientSection(doc, quotation);
+  addItemsTable(doc, quotation.items, quotation.totalAmount);
   addFooter(doc);
 
   doc.end();

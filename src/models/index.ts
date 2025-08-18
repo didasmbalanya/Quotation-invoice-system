@@ -16,7 +16,7 @@ export class Quotation
   public email!: string;
   public phone!: string;
   public quotationDate!: Date;
-  public items!: string;
+  public items!: object | string; // Can be JSON object or stringified JSON
   public status: "pending" | "approved" | "rejected"  = "pending"; // Default status
   public totalAmount!: number;
   public readonly createdAt!: Date;
@@ -54,7 +54,7 @@ Quotation.init(
       allowNull: false,
     },
     items: {
-      type: DataTypes.TEXT,
+      type: DataTypes.JSON,
       allowNull: false,
     },
     totalAmount: {
