@@ -45,3 +45,13 @@ The application will automatically load the correct environment file based on `N
 npm install
 npm run dev
 ```
+## Test Setup
+Integration tests have been written to work with a mysql db. The tests automatically clear the DB and so they can be rerun many times without any issues.
+
+1. Start your mysql db
+2. Fill your .env.test file
+3. run
+```bash
+npm install
+npm run test
+```
