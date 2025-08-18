@@ -27,3 +27,34 @@ export function validateQuotation(
   }
   next();
 }
+
+ const updateQuotationSchema = Joi.object<Partial<QuotationAttributes>>({
+  clientName: Joi.string().optional(),
+  email: Joi.string().email().optional(),
+  phone: Joi.string().optional(),
+  quotationDate: Joi.date().optional(),
+  items: Joi.string().optional(), // Should be a stringified JSON
+  totalAmount: Joi.number().optional(),
+  status: Joi.string().valid("pending", "approved", "rejected").optional(),
+})
+  .min(1) // Require at least one field to be updated
+  .messages({
+    "object.min": "At least one field must be provided to update the quotation",
+  });
+
+export function validateQuotationUpdate(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { error } = updateQuotationSchema.validate(req.body, {
+    abortEarly: false,
+  });
+  if (error) {
+    return res.status(400).json({
+      error: "Validation error",
+      details: error.details.map((d) => d.message),
+    });
+  }
+  next();
+}
