@@ -54,7 +54,6 @@ describe("API Endpoints", () => {
         .patch(`/api/quotations/${createdQuotationId}`)
         .send({ status: "approved" });
 
-        console.log('res.body', res.body)
       expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty(
         "message",
@@ -62,7 +61,7 @@ describe("API Endpoints", () => {
       );
     });
 
-    it.skip("should get a quotation PDF", async () => {
+    it("should get a quotation PDF", async () => {
       const res = await request(app).get(
         `/api/quotations/${createdQuotationId}/pdf`
       );
@@ -72,7 +71,7 @@ describe("API Endpoints", () => {
     });
   });
 
-  describe.skip("Invoice Endpoints", () => {
+  describe("Invoice Endpoints", () => {
     it("should create an invoice from a quotation", async () => {
       const res = await request(app).post(
         `/api/invoices/${createdQuotationId}`
