@@ -87,59 +87,149 @@ function addItemsTable(
   const tableTop = doc.y + 10;
   let y = tableTop;
 
+  // Column positions and widths
+  const descX = 54;
+  const descWidth = 200;
+  const qtyX = descX + descWidth + 10; // 264
+  const qtyWidth = 50;
+  const daysX = qtyX + qtyWidth + 10; // 324
+  const daysWidth = 50;
+  const priceX = daysX + daysWidth + 10; // 384
+  const priceWidth = 60;
+  const amountX = priceX + priceWidth + 10; // 454
+  const amountWidth = 86;
+
   // Table Header
-  doc.rect(50, y, 500, 20).fill(secondaryColor).stroke(); // changed from 430 to 500
+  doc.rect(50, y, 500, 20).fill(secondaryColor).stroke();
 
   doc
     .font("Helvetica-Bold")
     .fontSize(10)
     .fillColor("white")
-    .text("DESCRIPTION", 54, y + 5)
-    .text("QTY", 270, y + 5)
-    .text("UNIT PRICE", 340, y + 5)
-    .text("AMOUNT", 450, y + 5);
+    .text("DESCRIPTION", descX, y + 5, { width: descWidth })
+    .text("QTY", qtyX, y + 5, { width: qtyWidth, align: "right" })
+    .text("DAYS", daysX, y + 5, { width: daysWidth, align: "right" })
+    .text("UNIT PRICE", priceX, y + 5, { width: priceWidth, align: "right" })
+    .text("AMOUNT", amountX, y + 5, { width: amountWidth, align: "right" });
 
   y += 20;
 
   // Table Rows
   items.forEach((item, idx) => {
-    // Optional: alternate row color
-    if (idx % 2 === 0) {
-      doc.rect(50, y, 500, 20).fill("#fff").stroke();
-    } else {
-      doc.rect(50, y, 500, 20).fill("#f8f6f2").stroke();
-    }
+    const rowColor = idx % 2 === 0 ? "#fff" : "#f8f6f2";
+    doc.rect(50, y, 500, 20).fill(rowColor).stroke();
 
     doc
       .font("Helvetica")
       .fontSize(10)
       .fillColor("black")
-      .text(item.name, 54, y + 5)
-      .text(item.qty?.toString() || "-", 270, y + 5)
-      .text(item.price?.toFixed(2) || "0.00", 340, y + 5)
-      .text(((item.qty || 0) * (item.price || 0)).toFixed(2), 450, y + 5);
+      .text(item.name, descX, y + 5, { width: descWidth })
+      .text(item.qty?.toString() || "-", qtyX, y + 5, {
+        width: qtyWidth,
+        align: "right",
+      })
+      .text(item.days?.toString() || "-", daysX, y + 5, {
+        width: daysWidth,
+        align: "right",
+      })
+      .text(
+        item.unitPrice?.toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+        }) || "0.00",
+        priceX,
+        y + 5,
+        { width: priceWidth, align: "right" }
+      )
+      .text(
+        item.amount?.toLocaleString(undefined, { minimumFractionDigits: 2 }) ||
+          "0.00",
+        amountX,
+        y + 5,
+        { width: amountWidth, align: "right" }
+      );
 
-    y += 20;
+    y += 20 + 3.5;
+
+    // Render subItems if present
+    if (item.subItems && Array.isArray(item.subItems)) {
+      item.subItems.forEach((sub: string) => {
+        // Dynamically calculate height for wrapped subitem text
+        doc.font("Helvetica-Oblique").fontSize(9);
+        const subHeight = doc.heightOfString(`• ${sub}`, {
+          width: descWidth - 12,
+        });
+
+        doc.rect(50, y, 500, subHeight).fill(rowColor).stroke();
+        doc
+          .font("Helvetica-Oblique")
+          .fontSize(9)
+          .fillColor("#444")
+          .text(`• ${sub}`, descX + 12, y + 3, { width: descWidth - 12 });
+
+        y += subHeight + 4; 
+      });
+    }
   });
 
-  // Totals (styled to match screenshot)
+  y += 10;
   doc
     .font("Helvetica-Bold")
     .fontSize(10)
     .fillColor("black")
-    .text("SUB TOTAL", 340, y + 10)
-    .text(totalAmount.toFixed(2), 450, y + 10)
-    .text("VAT 16%", 340, y + 30)
-    .text((totalAmount * 0.16).toFixed(2), 450, y + 30)
-    .text("CLT 2%", 340, y + 50)
-    .text((totalAmount * 0.02).toFixed(2), 450, y + 50)
-    .text("SC 7%", 340, y + 70)
-    .text((totalAmount * 0.07).toFixed(2), 450, y + 70)
-    .text("TOTAL", 340, y + 90)
-    .text((totalAmount * 1.25).toFixed(2), 450, y + 90);
+    .text("SUB TOTAL", priceX, y, { width: priceWidth, align: "right" })
+    .text(
+      totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 }),
+      amountX,
+      y,
+      { width: amountWidth, align: "right" }
+    )
+    .text("VAT 16%", priceX, y + 18, { width: priceWidth, align: "right" })
+    .text(
+      (totalAmount * 0.16).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+      }),
+      amountX,
+      y + 18,
+      { width: amountWidth, align: "right" }
+    )
+    .text("CLT 2%", priceX, y + 36, { width: priceWidth, align: "right" })
+    .text(
+      (totalAmount * 0.02).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+      }),
+      amountX,
+      y + 36,
+      { width: amountWidth, align: "right" }
+    )
+    .text("SC 7%", priceX, y + 54, { width: priceWidth, align: "right" })
+    .text(
+      (totalAmount * 0.07).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+      }),
+      amountX,
+      y + 54,
+      { width: amountWidth, align: "right" }
+    )
+    .text("TOTAL", priceX, y + 72, { width: priceWidth, align: "right" })
+    .text(
+      (totalAmount * 1.25).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+      }),
+      amountX,
+      y + 72,
+      { width: amountWidth, align: "right" }
+    );
 }
 
 function addFooter(doc: PDFKit.PDFDocument) {
+  const requiredFooterHeight = 200;
+  if (
+    doc.y + requiredFooterHeight >
+    doc.page.height - doc.page.margins.bottom
+  ) {
+    doc.addPage();
+  }
+
   const startY = doc.y + 30;
   const leftX = 50;
   const rightX = 330;
@@ -210,7 +300,6 @@ function addFooter(doc: PDFKit.PDFDocument) {
     .lineWidth(1)
     .stroke();
 
-  // Move contact info further down
   doc
     .font("Helvetica")
     .fontSize(10)
