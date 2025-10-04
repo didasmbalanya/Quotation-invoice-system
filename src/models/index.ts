@@ -73,7 +73,7 @@ Quotation.init(
       allowNull: false,
     },
     status: {
-      type: DataTypes.ENUM("pending", "approved", "rejected"),
+      type: DataTypes.STRING,
       allowNull: false,
       defaultValue: "pending",
     },

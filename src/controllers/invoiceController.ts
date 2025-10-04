@@ -10,17 +10,29 @@ export const createInvoiceFromQuotation = async (
 ) => {
   const { id } = req.params;
   try {
-    const quotation = await Quotation.findByPk(id);
+    const invoiceNumber = generateInvoiceNumber(id);
+    const [quotation, invoiceExists] = await Promise.all([
+      Quotation.findByPk(id),
+      Invoice.findOne({ where: { invoiceNumber } }),
+    ]);
+
     if (!quotation) {
       return res.status(404).json({ error: "Quotation not found" });
+    }
+
+    if (invoiceExists) {
+      return res
+        .status(400)
+        .json({ error: "Invoice for this quotation already exists" });
     }
 
     await Quotation.update(
       { status: "approved" },
       { where: { id: quotation.id } }
     );
+
     const invoice = await Invoice.create({
-      invoiceNumber: generateInvoiceNumber(quotation.id),
+      invoiceNumber,
       invoiceDate: new Date(),
       quotationId: quotation.id,
     });
