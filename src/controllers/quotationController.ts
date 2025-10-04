@@ -41,6 +41,19 @@ export const listQuotations = async (req: Request, res: Response) => {
   }
 };
 
+export const getQuotationById = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const quotation = await Quotation.findByPk(id);
+    if (!quotation) {
+      return res.status(404).json({ error: "Quotation not found" });
+    }
+    res.status(200).json(quotation);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to retrieve quotation" });
+  }
+};
+
 export const updateQuotation = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {

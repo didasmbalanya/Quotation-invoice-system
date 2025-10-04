@@ -27,7 +27,7 @@ export const createInvoiceFromQuotation = async (
     }
 
     await Quotation.update(
-      { status: "rejected" },
+      { status: "approved" },
       { where: { id: quotation.id } }
     );
 
@@ -67,5 +67,18 @@ export const listInvoices = async (req: Request, res: Response) => {
     res.status(200).json(invoices);
   } catch (error) {
     res.status(500).json({ error: "Failed to retrieve invoices" });
+  }
+};
+
+export const getInvoiceById = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const invoice = await Invoice.findByPk(id);
+    if (!invoice) {
+      return res.status(404).json({ error: "Invoice not found" });
+    }
+    res.status(200).json(invoice);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to retrieve invoice" });
   }
 };
