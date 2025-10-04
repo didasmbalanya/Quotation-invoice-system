@@ -5,10 +5,9 @@ import { generateQuotationPDF } from "../services/pdfService";
 
 export const createQuotation = async (req: Request, res: Response) => {
   try {
-    const quotation = await Quotation.create(req.body);
     // check if we have already saved a quotation with the same uniqueId
     const duplicate = await Quotation.findOne({
-      where: { uniqueQuotationId: quotation.uniqueQuotationId },
+      where: { uniqueQuotationId: req.body.uniqueQuotationId },
     });
 
     if (duplicate) {
@@ -16,6 +15,7 @@ export const createQuotation = async (req: Request, res: Response) => {
         .status(400)
         .json({ error: "This Quotation has already been created" });
     }
+    const quotation = await Quotation.create(req.body);
     res.status(201).json(quotation);
   } catch (error) {
     res.status(500).json({ error: "Failed to create quotation" });

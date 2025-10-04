@@ -3,6 +3,7 @@ import request from "supertest";
 import app from "../src/app";
 import { Quotation, Invoice } from "../src/models";
 import sequelize from "../src/db";
+import { randomUUID } from "node:crypto";
 
 describe("API Endpoints", () => {
   let createdQuotationId: number;
@@ -11,6 +12,7 @@ describe("API Endpoints", () => {
   const sampleQuotation = {
     clientName: "John Doe",
     email: "john@example.com",
+    uniqueQuotationId: randomUUID(),
     phone: "1234567890",
     quotationDate: new Date().toISOString(),
     items: JSON.stringify([{ name: "Pizza", qty: 2, price: 10 }]),
@@ -38,8 +40,10 @@ describe("API Endpoints", () => {
       const res = await request(app)
         .post("/api/quotations")
         .send(sampleQuotation);
+
       expect(res.statusCode).toBe(201);
       expect(res.body).toHaveProperty("id");
+
       createdQuotationId = res.body.id;
     });
 

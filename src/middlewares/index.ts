@@ -5,6 +5,7 @@ import { QuotationAttributes } from "../types";
 // Define the Joi schema based on QuotationAttributes
 const quotationSchema = Joi.object<QuotationAttributes>({
   clientName: Joi.string().required(),
+  uniqueQuotationId: Joi.string(),
   email: Joi.string().email().required(),
   phone: Joi.string().required(),
   quotationDate: Joi.date().required(),
@@ -28,8 +29,9 @@ export function validateQuotation(
   next();
 }
 
- const updateQuotationSchema = Joi.object<Partial<QuotationAttributes>>({
+const updateQuotationSchema = Joi.object<Partial<QuotationAttributes>>({
   clientName: Joi.string().optional(),
+  uniqueQuotationId: Joi.string(),
   email: Joi.string().email().optional(),
   phone: Joi.string().optional(),
   quotationDate: Joi.date().optional(),
