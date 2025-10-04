@@ -1,8 +1,8 @@
 import { Optional } from "sequelize";
 
 export interface QuotationAttributes {
-  id?: number;
-  uniqueQuotationId: string;  
+  id?: string;
+  uniqueQuotationId: string;
   clientName: string;
   email: string;
   phone: string;
@@ -15,10 +15,10 @@ export interface QuotationAttributes {
 }
 
 export interface InvoiceAttributes {
-  id?: number;
+  id?: string;
   invoiceNumber: string;
   invoiceDate: Date;
-  quotationId: number;
+  quotationId: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
