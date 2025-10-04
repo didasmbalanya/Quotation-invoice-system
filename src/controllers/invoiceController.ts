@@ -27,7 +27,7 @@ export const createInvoiceFromQuotation = async (
     }
 
     await Quotation.update(
-      { status: "approved" },
+      { status: "rejected" },
       { where: { id: quotation.id } }
     );
 

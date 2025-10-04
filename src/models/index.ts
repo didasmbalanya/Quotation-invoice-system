@@ -18,7 +18,7 @@ export class Quotation
   public phone!: string;
   public quotationDate!: Date;
   public items!: object | string; // Can be JSON object or stringified JSON
-  public status: "pending" | "approved" | "rejected" = "pending"; // Default status
+  public status!: "pending" | "approved" | "rejected";
   public totalAmount!: number;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
