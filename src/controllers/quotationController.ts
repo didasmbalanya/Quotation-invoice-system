@@ -44,13 +44,9 @@ export const listQuotations = async (req: Request, res: Response) => {
 export const updateQuotation = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const [affectedRows] = await Quotation.update(req.body, {
+    await Quotation.update(req.body, {
       where: { id },
     });
-
-    if (affectedRows === 0) {
-      return res.status(404).json({ error: "Quotation not found" });
-    }
 
     const updatedQuotation = await Quotation.findByPk(id);
 

@@ -59,9 +59,22 @@ describe("API Endpoints", () => {
     status: "pending",
   };
 
+  let updatedQuotationId: string;
+
   beforeAll(async () => {
     await sequelize.authenticate();
     await sequelize.sync({ force: true });
+
+    // update quototation
+    const sampleQuotation2 = { ...sampleQuotation };
+    const uniq = randomUUID();
+    sampleQuotation2.uniqueQuotationId = uniq;
+
+    const res = await request(app)
+      .post("/api/quotations")
+      .send(sampleQuotation2);
+
+    updatedQuotationId = res.body.id;
   });
 
   afterAll(async () => {
@@ -94,7 +107,7 @@ describe("API Endpoints", () => {
 
     it("should update a quotation", async () => {
       const res = await request(app)
-        .patch(`/api/quotations/${createdQuotationId}`)
+        .patch(`/api/quotations/${updatedQuotationId}`)
         .send({ status: "approved" });
 
       expect(res.statusCode).toBe(200);
