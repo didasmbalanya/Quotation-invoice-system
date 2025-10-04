@@ -2,6 +2,7 @@ import { Optional } from "sequelize";
 
 export interface QuotationAttributes {
   id?: number;
+  uniqueQuotationId: string;  
   clientName: string;
   email: string;
   phone: string;

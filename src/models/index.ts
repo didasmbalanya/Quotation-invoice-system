@@ -13,6 +13,7 @@ export class Quotation
 {
   public id!: number;
   public clientName!: string;
+  public uniqueQuotationId!: string;
   public email!: string;
   public phone!: string;
   public quotationDate!: Date;
@@ -40,6 +41,11 @@ Quotation.init(
     clientName: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    uniqueQuotationId:{
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
     },
     email: {
       type: DataTypes.STRING,
