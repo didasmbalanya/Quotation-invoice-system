@@ -15,10 +15,20 @@ export const createQuotation = async (req: Request, res: Response) => {
         .status(400)
         .json({ error: "This Quotation has already been created" });
     }
+
+    // calculate total amount from items
+    const totalamount = req.body.items.reduce(
+      (sum: number, item: any) => sum + item.amount,
+      0
+    );
+    req.body.totalAmount = totalamount;
     const quotation = await Quotation.create(req.body);
     res.status(201).json(quotation);
   } catch (error) {
-    res.status(500).json({ error: "Failed to create quotation" });
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "Failed to create quotation", message: error });
   }
 };
 

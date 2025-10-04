@@ -10,7 +10,6 @@ const quotationSchema = Joi.object<QuotationAttributes>({
   phone: Joi.string().required(),
   quotationDate: Joi.date().required(),
   items: Joi.alternatives().try(Joi.string(), Joi.array()).required(),
-  totalAmount: Joi.number().required(),
   status: Joi.string().valid("pending", "approved", "rejected").optional(),
 });
 
@@ -31,12 +30,10 @@ export function validateQuotation(
 
 const updateQuotationSchema = Joi.object<Partial<QuotationAttributes>>({
   clientName: Joi.string().optional(),
-  uniqueQuotationId: Joi.string(),
   email: Joi.string().email().optional(),
   phone: Joi.string().optional(),
   quotationDate: Joi.date().optional(),
   items: Joi.alternatives().try(Joi.string(), Joi.array()).optional(),
-  totalAmount: Joi.number().optional(),
   status: Joi.string().valid("pending", "approved", "rejected").optional(),
 })
   .min(1) // Require at least one field to be updated

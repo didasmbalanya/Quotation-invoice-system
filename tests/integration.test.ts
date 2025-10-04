@@ -9,14 +9,53 @@ describe("API Endpoints", () => {
   let createdQuotationId: number;
   let createdInvoiceId: number;
 
+  const items = [
+    {
+      name: "FULL DAY CONFERENCE 24TH - 26TH JUNE 2025",
+      qty: 45,
+      days: 3,
+      unitPrice: 3500,
+      amount: 472500.0,
+      subItems: [
+        "AM/PM TEAS, COFFEE, HOT MILK, HOT WATER AND SNACKS",
+        "BUFFET LUNCH WITH A SOFT DRINK (soda or water)",
+        "A bottle of mineral water for the morning and afternoon session",
+        "Stationeries (Writing pads, pens, 1 flip chart and stand)",
+        "P.A & projector",
+        "Internet",
+        "Conference hall",
+      ],
+    },
+    {
+      name: "ACCOMMODATION BB 23RD - 27TH JUNE 2025",
+      qty: 5,
+      days: 4,
+      unitPrice: 12000,
+      amount: 240000.0,
+    },
+    {
+      name: "HB ACCOMMODATION 23RD - 27TH JUNE 2025",
+      qty: 40,
+      days: 4,
+      unitPrice: 15000,
+      amount: 2400000.0,
+    },
+    {
+      name: "AIRPORT PICK UP & DROP OFF 23RD & 27TH JUNE 2025",
+      qty: 2,
+      days: 2,
+      unitPrice: 3500,
+      amount: 14000.0,
+    },
+  ];
+
   const sampleQuotation = {
     clientName: "John Doe",
     email: "john@example.com",
     uniqueQuotationId: randomUUID(),
     phone: "1234567890",
     quotationDate: new Date().toISOString(),
-    items: JSON.stringify([{ name: "Pizza", qty: 2, price: 10 }]),
-    totalAmount: 20,
+    items,
     status: "pending",
   };
 
