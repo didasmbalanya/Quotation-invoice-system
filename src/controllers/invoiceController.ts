@@ -63,17 +63,24 @@ export const getInvoicePDF = async (req: Request, res: Response) => {
 
 export const listInvoices = async (req: Request, res: Response) => {
   try {
-    const invoices = await Invoice.findAll();
+    const invoices = await Invoice.findAll({
+      include: [{ model: Quotation, as: "quotation" }],
+    });
     res.status(200).json(invoices);
   } catch (error) {
-    res.status(500).json({ error: "Failed to retrieve invoices" });
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "Failed to retrieve invoices", errorMessage: error });
   }
 };
 
 export const getInvoiceById = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const invoice = await Invoice.findByPk(id);
+    const invoice = await Invoice.findByPk(id, {
+      include: [{ model: Quotation, as: "quotation" }],
+    });
     if (!invoice) {
       return res.status(404).json({ error: "Invoice not found" });
     }

@@ -114,3 +114,13 @@ Invoice.init(
     modelName: "Invoice",
   }
 );
+
+Invoice.belongsTo(Quotation, {
+  foreignKey: 'quotationId',
+  as: 'quotation', // optional alias
+});
+
+Quotation.hasMany(Invoice, {
+  foreignKey: 'quotationId',
+  as: 'invoices',
+});
