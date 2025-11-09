@@ -86,3 +86,20 @@ export const getQuotationPDF = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Failed to generate PDF" });
   }
 };
+
+export const deleteQuotation = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const deleted = await Quotation.destroy({
+      where: { id },
+    });
+
+    if (!deleted) {
+      return res.status(404).json({ error: "Quotation not found" });
+    }
+
+    res.status(200).json({ message: "Quotation deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to delete quotation" });
+  }
+};

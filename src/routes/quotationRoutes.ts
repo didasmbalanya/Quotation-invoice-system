@@ -5,6 +5,7 @@ import {
   updateQuotation,
   getQuotationPDF,
   getQuotationById,
+  deleteQuotation
 } from "../controllers/quotationController";
 import { validateQuotation, validateQuotationUpdate } from "../middlewares";
 
@@ -15,5 +16,6 @@ router.get("/", listQuotations);
 router.get("/:id", getQuotationById);
 router.patch("/:id", validateQuotationUpdate, updateQuotation);
 router.get("/:id/pdf", getQuotationPDF);
+router.delete("/:id", deleteQuotation);
 
 export default router;
