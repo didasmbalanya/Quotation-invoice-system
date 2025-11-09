@@ -90,6 +90,15 @@ export const getQuotationPDF = async (req: Request, res: Response) => {
 export const deleteQuotation = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
+
+    // check if invoice already exists for this quotation
+    const invoiceExists = await Quotation.sequelize!.models.Invoice.findOne({
+      where: { quotationId: id },
+    });
+
+    if (invoiceExists) {
+      return res.status(400).json({ error: "Cannot delete quotation with existing invoice" });
+    }
     const deleted = await Quotation.destroy({
       where: { id },
     });
@@ -100,6 +109,6 @@ export const deleteQuotation = async (req: Request, res: Response) => {
 
     res.status(200).json({ message: "Quotation deleted successfully" });
   } catch (error) {
-    res.status(500).json({ error: "Failed to delete quotation" });
+    res.status(500).json({ error: error instanceof Error ? error.message : "Failed to delete quotation" });
   }
 };
